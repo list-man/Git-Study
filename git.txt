@@ -23,8 +23,14 @@ git status 显示当前分支的状态
 git reset --hard HEAD
 
 git status   查看索引内容
+git log
+git show	显示不同对象的内容(blob, tree commit, tag) git show 40字符sha1值（当然也可以是部分前缀，一般前5位不一样就都不一样了)
+git ls-tree 40字符sha1值或部分前缀	显示某个tree对象的细节
 
 
 //详细见git config -h帮助
 git config --global user.name "JayGuo"	创建或修改全局配置文件节点
 git config --global --unset user.id	删除节点
+
+
+git reset --hard <commit>	回退到commit
