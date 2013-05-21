@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IEProtectMode", "IEProtectMode\IEProtectMode.vcxproj", "{B8FBE59E-CD0D-4ED9-B1EA-DBB85C0C730C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IEProtectModePS", "IEProtectMode\IEProtectModePS.vcxproj", "{145EF9EF-A918-4B36-81F6-9EF1B7B5528D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B8FBE59E-CD0D-4ED9-B1EA-DBB85C0C730C} = {B8FBE59E-CD0D-4ED9-B1EA-DBB85C0C730C}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B8FBE59E-CD0D-4ED9-B1EA-DBB85C0C730C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B8FBE59E-CD0D-4ED9-B1EA-DBB85C0C730C}.Debug|Win32.Build.0 = Debug|Win32
+		{B8FBE59E-CD0D-4ED9-B1EA-DBB85C0C730C}.Release|Win32.ActiveCfg = Release|Win32
+		{B8FBE59E-CD0D-4ED9-B1EA-DBB85C0C730C}.Release|Win32.Build.0 = Release|Win32
+		{145EF9EF-A918-4B36-81F6-9EF1B7B5528D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{145EF9EF-A918-4B36-81F6-9EF1B7B5528D}.Release|Win32.ActiveCfg = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
