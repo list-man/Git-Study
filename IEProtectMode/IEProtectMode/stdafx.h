@@ -29,6 +29,14 @@
 #include <ShlObj.h>
 
 
+#include "atlapp.h"
+#include "atlctrls.h"
+#include "atlctrlx.h"
+
+#include <iepmapi.h>
+#pragma comment(lib, "iepmapi")
+
+
 #ifndef CheckPointer
 #define CheckPointer(x, ret)	if (!x)	return ret;
 #endif

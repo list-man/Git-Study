@@ -23,15 +23,16 @@ class ATL_NO_VTABLE CStockBar :
 	public CComCoClass<CStockBar, &CLSID_StockBar>,
 	public IDispatchImpl<IStockBar, &IID_IStockBar, &LIBID_IEProtectModeLib, /*wMajor =*/ 1, /*wMinor =*/ 0>,
 	public IDeskBand,
-	public IObjectWithSite,
-	public CWindowImpl<CStockBar>
+	public CWindowImpl<CStockBar>,
+	public IObjectWithSiteImpl<CStockBar>
 {
 public:
 	CStockBar()
 	{
-		::MessageBox(NULL, L"ToolBar", NULL, MB_OK);
 		m_dwBandId = 0;
 		m_dwViewMode = 0;
+
+		m_IeProtectedMode = TRUE;
 	}
 
 	HRESULT FinalConstruct()
@@ -55,11 +56,26 @@ END_COM_MAP()
 
 BEGIN_MSG_MAP(CStockBar)
 	MESSAGE_HANDLER(WM_CREATE, OnCreate)
+	COMMAND_ID_HANDLER(IDC_BTN0, OnOpenMutex1)
+	COMMAND_ID_HANDLER(IDC_BTN1, OnOpenMutex2)
+	COMMAND_ID_HANDLER(IDC_SENDMSGBTN0, OnSendMsg1)
+	COMMAND_ID_HANDLER(IDC_SENDMSGBTN1, OnSendMsg2)
+	COMMAND_ID_HANDLER(IDC_RUNEXEBTN0, OnRunExe1)
+	COMMAND_ID_HANDLER(IDC_RUNEXEBTN1, OnRunExe2)
+	COMMAND_ID_HANDLER(IDC_SAVELOGBTN0, OnSaveLog1)
+	COMMAND_ID_HANDLER(IDC_SAVELOGBTN1, OnSaveLog2)
 END_MSG_MAP()
 
 public:
 	LRESULT OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-
+	LRESULT OnOpenMutex1(WORD nId, WORD nMsg, HWND hWnd, BOOL& bHandled);
+	LRESULT OnOpenMutex2(WORD nId, WORD nMsg, HWND hWnd, BOOL& bHandled);
+	LRESULT OnSendMsg1(WORD nId, WORD nMsg, HWND hWnd, BOOL& bHandled);
+	LRESULT OnSendMsg2(WORD nId, WORD nMsg, HWND hWnd, BOOL& bHandled);
+	LRESULT OnRunExe1(WORD nId, WORD nMsg, HWND hWnd, BOOL& bHandled);
+	LRESULT OnRunExe2(WORD nId, WORD nMsg, HWND hWnd, BOOL& bHandled);
+	LRESULT OnSaveLog1(WORD nId, WORD nMsg, HWND hWnd, BOOL& bHandled);
+	LRESULT OnSaveLog2(WORD nId, WORD nMsg, HWND hWnd, BOOL& bHandled);
 public:
 	// interface IObjectWithSite.
 	STDMETHOD(SetSite)(IUnknown *pUnkSite);
@@ -75,10 +91,20 @@ public:
 
 
 protected:
-	CComPtr<IUnknown>	m_spUnkSite;
 	CComPtr<IDockingWindowSite>	m_spDockingWndSite;
 	DWORD	m_dwBandId;
 	DWORD	m_dwViewMode;
+
+	WTL::CButton	m_btn0;
+	WTL::CButton	m_btn1;
+	WTL::CButton	m_SendMsgbtn0;
+	WTL::CButton	m_SendMsgbtn1;
+	WTL::CButton	m_RunExbtn0;
+	WTL::CButton	m_RunExbtn1;
+	WTL::CButton	m_SaveLogbtn0;
+	WTL::CButton	m_SaveLogbtn1;
+
+	BOOL		m_IeProtectedMode;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(StockBar), CStockBar)

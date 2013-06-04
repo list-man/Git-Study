@@ -7,25 +7,78 @@
 // CStockBar
 LRESULT CStockBar::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
+	if (SUCCEEDED(IEIsProtectedModeProcess(&m_IeProtectedMode)) && m_IeProtectedMode)
+		::MessageBox(m_hWnd, L"IE is running in protect mode now!", NULL, MB_OK);
+
+	m_btn0.Create(m_hWnd, CRect(10, 10, 100, 40), _T("Open Mutex1"), WS_CHILD|WS_VISIBLE, 0, IDC_BTN0);
+	m_btn1.Create(m_hWnd, CRect(10, 60, 100, 100), _T("Open Mutex2"), WS_CHILD|WS_VISIBLE, 0, IDC_BTN1);
+
+	m_SendMsgbtn0.Create(m_hWnd, CRect(140, 10, 240, 40), _T("Send Message1"), WS_CHILD|WS_VISIBLE, 0, IDC_SENDMSGBTN0);
+	m_SendMsgbtn1.Create(m_hWnd, CRect(140, 60, 240, 100), _T("Send Message2"), WS_CHILD|WS_VISIBLE, 0, IDC_SENDMSGBTN1);
+
+	m_RunExbtn0.Create(m_hWnd, CRect(10, 130, 100, 170), _T("Run Exe0"), WS_CHILD|WS_VISIBLE, 0, IDC_RUNEXEBTN0);
+	m_RunExbtn1.Create(m_hWnd, CRect(10, 190, 100, 230), _T("Run Exe1"), WS_CHILD|WS_VISIBLE, 0, IDC_RUNEXEBTN1);
+
+	m_SaveLogbtn0.Create(m_hWnd, CRect(140, 130, 230, 170), _T("Save Log0"), WS_CHILD|WS_VISIBLE, 0, IDC_SAVELOGBTN0);
+	m_SaveLogbtn1.Create(m_hWnd, CRect(140, 190, 230, 230), _T("Save Log1"), WS_CHILD|WS_VISIBLE, 0, IDC_SAVELOGBTN1);
+	return 0;
+}
+
+LRESULT CStockBar::OnOpenMutex1(WORD nId, WORD nMsg, HWND hWnd, BOOL& bHandled)
+{
+	::MessageBox(m_hWnd, _T("OpenMutex1"), NULL, MB_OK);
+	return 0;
+}
+
+LRESULT CStockBar::OnOpenMutex2(WORD nId, WORD nMsg, HWND hWnd, BOOL& bHandled)
+{
+	return 0;
+}
+
+LRESULT CStockBar::OnSendMsg1(WORD nId, WORD nMsg, HWND hWnd, BOOL& bHandled)
+{
+	return 0;
+}
+
+LRESULT CStockBar::OnSendMsg2(WORD nId, WORD nMsg, HWND hWnd, BOOL& bHandled)
+{
+	return 0;
+}
+
+LRESULT CStockBar::OnRunExe1(WORD nId, WORD nMsg, HWND hWnd, BOOL& bHandled)
+{
+	return 0;
+}
+
+LRESULT CStockBar::OnRunExe2(WORD nId, WORD nMsg, HWND hWnd, BOOL& bHandled)
+{
+	return 0;
+}
+
+LRESULT CStockBar::OnSaveLog1(WORD nId, WORD nMsg, HWND hWnd, BOOL& bHandled)
+{
+	return 0;
+}
+
+LRESULT CStockBar::OnSaveLog2(WORD nId, WORD nMsg, HWND hWnd, BOOL& bHandled)
+{
 	return 0;
 }
 
 STDMETHODIMP CStockBar::SetSite(IUnknown *pUnkSite)
 {
-	m_spUnkSite.Release();
-	if (pUnkSite)
-		pUnkSite->QueryInterface(&m_spUnkSite);
+	__super::SetSite(pUnkSite);
 
 	if (!m_hWnd)
 	{
-		CComQIPtr<IDockingWindowSite> spDkwndSite = pUnkSite;
-		if (spDkwndSite)
+		CComQIPtr<IOleWindow> spOleWnd = pUnkSite;
+		if (spOleWnd)
 		{
 			HWND hDockingWnd = NULL;
-			spDkwndSite->GetWindow(&hDockingWnd);
+			spOleWnd->GetWindow(&hDockingWnd);
 			if (hDockingWnd)
 			{
-				Create(hDockingWnd, CRect(0, 0, 100, 20), NULL, WS_CHILD|WS_VISIBLE);
+				Create(hDockingWnd, CRect(0, 0, 100, 110), NULL, WS_CHILD|WS_VISIBLE);
 			}
 		}
 	}
@@ -65,13 +118,9 @@ STDMETHODIMP CStockBar::ContextSensitiveHelp(BOOL fEnterMode)
 STDMETHODIMP CStockBar::ShowDW(BOOL fShow)
 {
 	ShowWindow(fShow ? SW_SHOWNORMAL:SW_HIDE);
-	if (!fShow && m_spUnkSite)
+	if (!fShow && m_spDockingWndSite)
 	{
-		CComQIPtr<IDockingWindowSite> spDkWndSite = m_spUnkSite;
-		if (spDkWndSite)
-		{
-			return spDkWndSite->SetBorderSpaceDW(NULL, NULL);
-		}
+		return m_spDockingWndSite->SetBorderSpaceDW(NULL, NULL);
 	}
 
 	return S_OK;
@@ -95,9 +144,10 @@ STDMETHODIMP CStockBar::ResizeBorderDW(LPCRECT prcBorder, IUnknown *punkToolbarS
 
 	if (m_spDockingWndSite)
 	{
-		m_spDockingWndSite->SetBorderSpaceDW(static_cast<IDockingWindow*>(this), prcBorder);
+		return m_spDockingWndSite->SetBorderSpaceDW(static_cast<IDockingWindow*>(this), prcBorder);
 	}
-	return E_NOTIMPL;
+
+	return S_OK;
 }
 
 STDMETHODIMP CStockBar::GetBandInfo(DWORD dwBandID, DWORD dwViewMode, DESKBANDINFO *pdbi)
@@ -110,32 +160,32 @@ STDMETHODIMP CStockBar::GetBandInfo(DWORD dwBandID, DWORD dwViewMode, DESKBANDIN
 		if (pdbi->dwMask & DBIM_MINSIZE)
 		{
 			pdbi->ptMinSize.x = 100;
-			pdbi->ptMinSize.y = 10;
+			pdbi->ptMinSize.y = 100;
 		}
 		
 		if (pdbi->dwMask & DBIM_MAXSIZE)
 		{
 			pdbi->ptMaxSize.x= 1024;
-			pdbi->ptMaxSize.y = 50;
+			pdbi->ptMaxSize.y = 500;
 		}
 
-		if (pdbi->dwMask & DBIM_INTEGRAL)
+		if (pdbi->dwModeFlags & DBIMF_VARIABLEHEIGHT && pdbi->dwMask & DBIM_INTEGRAL)
 		{
-			pdbi->ptMinSize.y = 5;
+			pdbi->ptIntegral.y = 5;
 		}
 
 		if (pdbi->dwMask & DBIM_ACTUAL)
 		{
 			pdbi->ptActual.x = 200;
-			pdbi->ptActual.y = 20;
+			pdbi->ptActual.y = 40;
 		}
 
 		if (pdbi->dwMask & DBIM_TITLE)
 		{
-			wcscpy(pdbi->wszTitle, L"My browser Tool bar");
+			wcscpy_s(pdbi->wszTitle, L"My browser Tool bar");
 		}
 
-		if (pdbi->dwMask & DBIM_MODEFLAGS);
+		if (pdbi->dwMask & DBIM_MODEFLAGS)
 		{
 			pdbi->dwModeFlags = DBIMF_NORMAL | DBIMF_BKCOLOR;
 		}
