@@ -71,6 +71,9 @@
     <None Include="StockBar.rgs">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="bitmap1.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="IEProtectMode.idl">

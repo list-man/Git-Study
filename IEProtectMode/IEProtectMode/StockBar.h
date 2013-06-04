@@ -23,13 +23,12 @@ class ATL_NO_VTABLE CStockBar :
 	public CComCoClass<CStockBar, &CLSID_StockBar>,
 	public IDispatchImpl<IStockBar, &IID_IStockBar, &LIBID_IEProtectModeLib, /*wMajor =*/ 1, /*wMinor =*/ 0>,
 	public IDeskBand,
-	public IObjectWithSite,
-	public CWindowImpl<CStockBar>
+	public CWindowImpl<CStockBar>,
+	public IObjectWithSiteImpl<CStockBar>
 {
 public:
 	CStockBar()
 	{
-		::MessageBox(NULL, L"ToolBar", NULL, MB_OK);
 		m_dwBandId = 0;
 		m_dwViewMode = 0;
 	}
@@ -75,10 +74,11 @@ public:
 
 
 protected:
-	CComPtr<IUnknown>	m_spUnkSite;
 	CComPtr<IDockingWindowSite>	m_spDockingWndSite;
 	DWORD	m_dwBandId;
 	DWORD	m_dwViewMode;
+
+	WTL::CBitmapButton	m_btn;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(StockBar), CStockBar)

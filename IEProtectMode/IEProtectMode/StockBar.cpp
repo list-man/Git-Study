@@ -7,25 +7,25 @@
 // CStockBar
 LRESULT CStockBar::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
+	m_btn.SetBitmap();
+	m_btn.Create(m_hWnd, CRect(10, 10, 20, 20));
 	return 0;
 }
 
 STDMETHODIMP CStockBar::SetSite(IUnknown *pUnkSite)
 {
-	m_spUnkSite.Release();
-	if (pUnkSite)
-		pUnkSite->QueryInterface(&m_spUnkSite);
+	__super::SetSite(pUnkSite);
 
 	if (!m_hWnd)
 	{
-		CComQIPtr<IDockingWindowSite> spDkwndSite = pUnkSite;
-		if (spDkwndSite)
+		CComQIPtr<IOleWindow> spOleWnd = pUnkSite;
+		if (spOleWnd)
 		{
 			HWND hDockingWnd = NULL;
-			spDkwndSite->GetWindow(&hDockingWnd);
+			spOleWnd->GetWindow(&hDockingWnd);
 			if (hDockingWnd)
 			{
-				Create(hDockingWnd, CRect(0, 0, 100, 20), NULL, WS_CHILD|WS_VISIBLE);
+				Create(hDockingWnd, CRect(0, 0, 100, 110), NULL, WS_CHILD|WS_VISIBLE);
 			}
 		}
 	}
@@ -65,13 +65,9 @@ STDMETHODIMP CStockBar::ContextSensitiveHelp(BOOL fEnterMode)
 STDMETHODIMP CStockBar::ShowDW(BOOL fShow)
 {
 	ShowWindow(fShow ? SW_SHOWNORMAL:SW_HIDE);
-	if (!fShow && m_spUnkSite)
+	if (!fShow && m_spDockingWndSite)
 	{
-		CComQIPtr<IDockingWindowSite> spDkWndSite = m_spUnkSite;
-		if (spDkWndSite)
-		{
-			return spDkWndSite->SetBorderSpaceDW(NULL, NULL);
-		}
+		return m_spDockingWndSite->SetBorderSpaceDW(NULL, NULL);
 	}
 
 	return S_OK;
@@ -95,9 +91,10 @@ STDMETHODIMP CStockBar::ResizeBorderDW(LPCRECT prcBorder, IUnknown *punkToolbarS
 
 	if (m_spDockingWndSite)
 	{
-		m_spDockingWndSite->SetBorderSpaceDW(static_cast<IDockingWindow*>(this), prcBorder);
+		return m_spDockingWndSite->SetBorderSpaceDW(static_cast<IDockingWindow*>(this), prcBorder);
 	}
-	return E_NOTIMPL;
+
+	return S_OK;
 }
 
 STDMETHODIMP CStockBar::GetBandInfo(DWORD dwBandID, DWORD dwViewMode, DESKBANDINFO *pdbi)
@@ -110,32 +107,32 @@ STDMETHODIMP CStockBar::GetBandInfo(DWORD dwBandID, DWORD dwViewMode, DESKBANDIN
 		if (pdbi->dwMask & DBIM_MINSIZE)
 		{
 			pdbi->ptMinSize.x = 100;
-			pdbi->ptMinSize.y = 10;
+			pdbi->ptMinSize.y = 100;
 		}
 		
 		if (pdbi->dwMask & DBIM_MAXSIZE)
 		{
 			pdbi->ptMaxSize.x= 1024;
-			pdbi->ptMaxSize.y = 50;
+			pdbi->ptMaxSize.y = 500;
 		}
 
-		if (pdbi->dwMask & DBIM_INTEGRAL)
+		if (pdbi->dwModeFlags & DBIMF_VARIABLEHEIGHT && pdbi->dwMask & DBIM_INTEGRAL)
 		{
-			pdbi->ptMinSize.y = 5;
+			pdbi->ptIntegral.y = 5;
 		}
 
 		if (pdbi->dwMask & DBIM_ACTUAL)
 		{
 			pdbi->ptActual.x = 200;
-			pdbi->ptActual.y = 20;
+			pdbi->ptActual.y = 40;
 		}
 
 		if (pdbi->dwMask & DBIM_TITLE)
 		{
-			wcscpy(pdbi->wszTitle, L"My browser Tool bar");
+			wcscpy_s(pdbi->wszTitle, L"My browser Tool bar");
 		}
 
-		if (pdbi->dwMask & DBIM_MODEFLAGS);
+		if (pdbi->dwMask & DBIM_MODEFLAGS)
 		{
 			pdbi->dwModeFlags = DBIMF_NORMAL | DBIMF_BKCOLOR;
 		}
